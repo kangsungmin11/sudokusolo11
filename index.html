@@ -1,0 +1,1499 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>말랑말랑 스도쿠 탐험대</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Jua&display=swap');
+
+        :root {
+            --bg-color: #FFF9E6;
+            --primary: #FF8A65;
+            --secondary: #4FC3F7;
+            --accent: #FFD54F;
+            --success: #81C784;
+            --error: #E57373;
+            --text: #37474F;
+            --box0: #E3F2FD;
+            --box1: #FCE4EC;
+            --box2: #E8F5E9;
+            --box3: #FFF3E0;
+            --box4: #F3E5F5;
+            --box5: #E0F7FA;
+        }
+
+        * {
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            font-family: 'Jua', 'Malgun Gothic', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text);
+            margin: 0;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 740px;
+            width: 100%;
+            background: #FFFFFF;
+            border-radius: 28px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+            padding: 22px;
+            border: 4px solid var(--accent);
+            text-align: center;
+        }
+
+        h1 {
+            margin: 0 0 12px 0;
+            font-size: 2rem;
+            color: #FF7043;
+            text-shadow: 2px 2px 0px #FFE0B2;
+        }
+
+        /* 상단 모드 전환 탭 */
+        .mode-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            font-family: inherit;
+            font-size: 1.1rem;
+            padding: 10px 18px;
+            border: none;
+            border-radius: 18px;
+            cursor: pointer;
+            background: #ECEFF1;
+            color: #78909C;
+            transition: all 0.2s;
+            box-shadow: 0 4px 0 #CFD8DC;
+        }
+
+        .tab-btn.active {
+            background: var(--secondary);
+            color: white;
+            box-shadow: 0 4px 0 #0288D1;
+            transform: translateY(-2px);
+        }
+
+        /* 튜토리얼 7단계 버튼 바 */
+        .tutorial-steps-bar {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+            background: #F5F7F8;
+            padding: 10px;
+            border-radius: 16px;
+        }
+
+        .step-chip {
+            font-family: inherit;
+            font-size: 0.92rem;
+            padding: 6px 11px;
+            border-radius: 12px;
+            border: 2px solid #CFD8DC;
+            background: white;
+            color: #607D8B;
+            cursor: pointer;
+            transition: 0.15s;
+        }
+
+        .step-chip.active {
+            background: #FF7043;
+            color: white;
+            border-color: #D84315;
+            transform: scale(1.04);
+        }
+
+        .step-chip.cleared {
+            background: #E8F5E9;
+            border-color: #81C784;
+            color: #2E7D32;
+        }
+
+        /* 단계별 세부 문제 선택 바 (1~4번 문제) */
+        .sub-problem-bar {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+
+        .prob-btn {
+            font-family: inherit;
+            font-size: 0.95rem;
+            padding: 6px 14px;
+            border-radius: 14px;
+            border: 2px solid #FFE082;
+            background: #FFFDE7;
+            color: #795548;
+            cursor: pointer;
+            transition: 0.15s;
+        }
+
+        .prob-btn.active {
+            background: #FFB300;
+            color: white;
+            border-color: #FF8F00;
+            box-shadow: 0 3px 0 #FF8F00;
+            transform: translateY(-1px);
+        }
+
+        .prob-btn.cleared {
+            background: #E8F5E9;
+            border-color: #81C784;
+            color: #2E7D32;
+        }
+
+        .prob-btn.active.cleared {
+            background: #43A047;
+            color: white;
+            border-color: #2E7D32;
+        }
+
+        /* 판 크기 & 난이도 선택 바 */
+        .play-settings-bar {
+            display: none;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 14px;
+            background: #F5F7F8;
+            padding: 12px;
+            border-radius: 16px;
+        }
+
+        .setting-row {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .setting-label {
+            font-size: 1rem;
+            color: #546E7A;
+            margin-right: 4px;
+        }
+
+        /* 공통 옵션 컨트롤 */
+        .controls-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .badge-group {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .option-btn {
+            font-family: inherit;
+            font-size: 0.98rem;
+            padding: 7px 13px;
+            border-radius: 13px;
+            border: 2px solid #B0BEC5;
+            background: white;
+            color: var(--text);
+            cursor: pointer;
+            transition: 0.15s;
+        }
+
+        .option-btn.active {
+            background: #FFF3E0;
+            border-color: #FF9800;
+            color: #E65100;
+        }
+
+        .status-pill {
+            background: #E1F5FE;
+            color: #0277BD;
+            padding: 6px 14px;
+            border-radius: 14px;
+            font-size: 1rem;
+        }
+
+        /* 선생님 말풍선 가이드 (2코스에서는 기본 숨김) */
+        .guide-box {
+            background: #FFFDE7;
+            border: 3px dashed #FFB300;
+            border-radius: 20px;
+            padding: 14px 16px;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            text-align: left;
+            min-height: 86px;
+        }
+
+        .guide-box.hidden {
+            display: none !important;
+        }
+
+        .mascot {
+            font-size: 2.8rem;
+            flex-shrink: 0;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        .speech-text {
+            font-size: 1.1rem;
+            line-height: 1.45;
+            color: #4E342E;
+            word-break: keep-all;
+        }
+
+        .highlight-text {
+            color: #D84315;
+            background: #FFE082;
+            padding: 1px 6px;
+            border-radius: 6px;
+        }
+
+        .step-badge {
+            display: inline-block;
+            background: #FF7043;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 8px;
+            font-size: 0.92rem;
+            margin-bottom: 4px;
+        }
+
+        /* 스도쿠 보드 */
+        .board-wrapper {
+            display: flex;
+            justify-content: center;
+            margin: 10px 0 18px 0;
+        }
+
+        .board {
+            display: grid;
+            border: 5px solid #37474F;
+            border-radius: 16px;
+            overflow: hidden;
+            background: #37474F;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+        }
+
+        .board.size-4 {
+            grid-template-columns: repeat(4, 76px);
+            grid-template-rows: repeat(4, 76px);
+        }
+        .board.size-5 {
+            grid-template-columns: repeat(5, 66px);
+            grid-template-rows: repeat(5, 66px);
+        }
+        .board.size-6 {
+            grid-template-columns: repeat(6, 58px);
+            grid-template-rows: repeat(6, 58px);
+        }
+
+        .cell {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.1rem;
+            cursor: pointer;
+            position: relative;
+            transition: transform 0.15s, background-color 0.2s;
+            border: 1px solid rgba(55, 71, 79, 0.25);
+        }
+
+        .board.size-5 .cell { font-size: 1.85rem; }
+        .board.size-6 .cell { font-size: 1.65rem; }
+
+        .cell.thick-right {
+            border-right: 4px solid #37474F;
+        }
+        .cell.thick-bottom {
+            border-bottom: 4px solid #37474F;
+        }
+
+        .box-0 { background-color: var(--box0); }
+        .box-1 { background-color: var(--box1); }
+        .box-2 { background-color: var(--box2); }
+        .box-3 { background-color: var(--box3); }
+        .box-4 { background-color: var(--box4); }
+        .box-5 { background-color: var(--box5); }
+        .box-row-even { background-color: #F8FDFF; }
+        .box-row-odd { background-color: #FFFDF7; }
+
+        .cell.fixed {
+            cursor: default;
+            color: #263238;
+        }
+
+        .cell.user-filled {
+            color: #1565C0;
+        }
+
+        .cell.related {
+            filter: brightness(0.93);
+        }
+
+        .cell.selected {
+            outline: 4px solid #FF6F00;
+            outline-offset: -4px;
+            z-index: 2;
+            transform: scale(0.96);
+            background-color: #FFF59D !important;
+        }
+
+        .cell.easy-spot {
+            box-shadow: inset 0 0 0 4px #4CAF50;
+        }
+
+        .cell.conflict {
+            background-color: #FFCDD2 !important;
+            color: #C62828 !important;
+            animation: shake 0.4s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            75% { transform: translateX(6px); }
+        }
+
+        @keyframes pop {
+            0% { transform: scale(0.6); }
+            70% { transform: scale(1.12); }
+            100% { transform: scale(1); }
+        }
+
+        /* 숫자 입력 패드 */
+        .numpad {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 18px;
+            flex-wrap: wrap;
+        }
+
+        .num-btn {
+            font-family: inherit;
+            width: 62px;
+            height: 62px;
+            border-radius: 18px;
+            border: none;
+            background: #FF8A65;
+            color: white;
+            font-size: 1.85rem;
+            cursor: pointer;
+            box-shadow: 0 5px 0 #D84315;
+            transition: all 0.1s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .num-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 1px 0 #D84315;
+        }
+
+        .num-btn.erase-btn {
+            background: #90A4AE;
+            box-shadow: 0 5px 0 #546E7A;
+            font-size: 1.1rem;
+            width: 74px;
+        }
+
+        /* 하단 액션 버튼 */
+        .action-bar {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            font-family: inherit;
+            font-size: 1.08rem;
+            padding: 11px 18px;
+            border-radius: 16px;
+            border: none;
+            cursor: pointer;
+            transition: 0.15s;
+        }
+
+        .btn-find {
+            background: #B3E5FC;
+            color: #01579B;
+            box-shadow: 0 4px 0 #0288D1;
+        }
+
+        .btn-hint {
+            background: #FFD54F;
+            color: #5D4037;
+            box-shadow: 0 4px 0 #FFA000;
+        }
+
+        .btn-new {
+            background: #81C784;
+            color: white;
+            box-shadow: 0 4px 0 #388E3C;
+        }
+
+        .action-btn:active {
+            transform: translateY(3px);
+        }
+
+        /* 칭찬 모달 */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+        }
+
+        .modal {
+            background: white;
+            padding: 28px;
+            border-radius: 28px;
+            border: 5px solid #FFD54F;
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            animation: pop 0.35s;
+        }
+
+        .modal h2 {
+            color: #FF7043;
+            font-size: 1.9rem;
+            margin: 10px 0;
+        }
+
+        .stars {
+            font-size: 3.2rem;
+            margin: 8px 0;
+        }
+
+        @media (max-width: 480px) {
+            .board.size-4 {
+                grid-template-columns: repeat(4, 64px);
+                grid-template-rows: repeat(4, 64px);
+            }
+            .board.size-5 {
+                grid-template-columns: repeat(5, 54px);
+                grid-template-rows: repeat(5, 54px);
+            }
+            .board.size-6 {
+                grid-template-columns: repeat(6, 46px);
+                grid-template-rows: repeat(6, 46px);
+            }
+            .cell { font-size: 1.7rem; }
+            .board.size-5 .cell { font-size: 1.5rem; }
+            .board.size-6 .cell { font-size: 1.35rem; }
+            .num-btn { width: 52px; height: 52px; font-size: 1.55rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🧩 말랑말랑 스도쿠 탐험대</h1>
+
+    <!-- 모드 전환 탭 -->
+    <div class="mode-tabs">
+        <button class="tab-btn active" id="tab-tutorial" onclick="switchMode('tutorial')">
+            📘 1코스: 7단계 차근차근 배우기
+        </button>
+        <button class="tab-btn" id="tab-play" onclick="switchMode('play')">
+            🎮 2코스: 4×4 · 5×5 · 6×6 놀이터
+        </button>
+    </div>
+
+    <!-- 튜토리얼 7단계 선택 바 -->
+    <div class="tutorial-steps-bar" id="tutorial-bar"></div>
+
+    <!-- 놀이터 설정 바 (4x4, 5x5, 6x6 및 난이도) -->
+    <div class="play-settings-bar" id="play-settings">
+        <div class="setting-row">
+            <span class="setting-label">📏 판 크기:</span>
+            <button class="option-btn active" id="size-4" onclick="setBoardSize(4)">4×4 미니 (네모방)</button>
+            <button class="option-btn" id="size-5" onclick="setBoardSize(5)">5×5 오각형 탐험 (줄 퍼즐)</button>
+            <button class="option-btn" id="size-6" onclick="setBoardSize(6)">6×6 척척박사 (6칸방)</button>
+        </div>
+        <div class="setting-row">
+            <span class="setting-label">⭐ 난이도:</span>
+            <button class="option-btn active" id="diff-easy" onclick="setDifficulty('easy')">🌱 쉬움</button>
+            <button class="option-btn" id="diff-normal" onclick="setDifficulty('normal')">🌿 보통</button>
+            <button class="option-btn" id="diff-hard" onclick="setDifficulty('hard')">🌳 도전!</button>
+        </div>
+    </div>
+
+    <!-- 단계별 문제 번호 선택 바 (각 단계마다 4문제씩 제공) -->
+    <div class="sub-problem-bar" id="sub-problem-bar"></div>
+
+    <!-- 상단 옵션 & 남은 빈칸 표시 -->
+    <div class="controls-bar">
+        <div class="badge-group">
+            <button class="option-btn active" id="btn-symbol-num" onclick="setSymbolMode('number')">
+                🔢 숫자 모드
+            </button>
+            <button class="option-btn" id="btn-symbol-fruit" onclick="setSymbolMode('fruit')">
+                🍎 과일 그림 모드
+            </button>
+        </div>
+        <div class="status-pill" id="remain-pill">남은 빈칸: 0개</div>
+    </div>
+
+    <!-- 부엉이 선생님 설명 말풍선 (1코스 전용 + 2코스는 힌트/오답 시에만 표시) -->
+    <div class="guide-box" id="guide-box">
+        <div class="mascot" id="mascot-face">🦉</div>
+        <div class="speech-text" id="guide-text"></div>
+    </div>
+
+    <!-- 게임 보드 -->
+    <div class="board-wrapper">
+        <div class="board size-4" id="board"></div>
+    </div>
+
+    <!-- 숫자/과일 입력 버튼 패드 -->
+    <div class="numpad" id="numpad"></div>
+
+    <!-- 하단 도움말 & 액션 버튼 -->
+    <div class="action-bar">
+        <button class="action-btn btn-find" onclick="highlightEasiestCell()">🔍 쉬운 칸 찾기</button>
+        <button class="action-btn btn-hint" onclick="giveHint()">💡 선생님 힌트!</button>
+        <button class="action-btn btn-new" id="btn-next-or-new" onclick="handleNextAction()">🔄 다시 하기</button>
+    </div>
+</div>
+
+<!-- 성공 축하 모달 -->
+<div class="modal-overlay" id="win-modal">
+    <div class="modal">
+        <div class="stars">🌟🏆🌟</div>
+        <h2 id="modal-title">참 잘했어요!</h2>
+        <p id="modal-desc" style="font-size: 1.15rem; color: #546E7A; line-height: 1.45;"></p>
+        <button class="action-btn btn-new" id="modal-next-btn" onclick="closeModalAndNext()">다음 문제로 출발! 🚀</button>
+    </div>
+</div>
+
+<script>
+    const SYMBOLS = {
+        number: ['', '1', '2', '3', '4', '5', '6'],
+        fruit: ['', '🍎', '🍌', '🍇', '🍊', '🍓', '🍉']
+    };
+    const SYMBOL_NAMES = {
+        number: ['', '1', '2', '3', '4', '5', '6'],
+        fruit: ['', '사과(🍎)', '바나나(🍌)', '포도(🍇)', '오렌지(🍊)', '딸기(🍓)', '수박(🍉)']
+    };
+
+    let symbolMode = 'number';
+    let gameMode = 'tutorial'; // 'tutorial' | 'play'
+    let tutorialStep = 0;      // 0 ~ 6 (7단계)
+    let tutorialProbIdx = 0;   // 0 ~ 3 (각 단계당 4문제: 기존 1 + 추가 3)
+    let clearedTutorialProbs = new Set(); // "step-prob" 형태 저장
+
+    let boardSize = 4;         // 4, 5, 6
+    let difficulty = 'easy';   // 'easy', 'normal', 'hard'
+    let playProbIdx = 0;       // 0 ~ 3 (각 크기·난이도당 4개 프리셋 스테이지 + 무제한 랜덤)
+    let clearedPlayProbs = new Set(); // "size-diff-prob" 형태 저장
+
+    let solution = [];
+    let puzzle = [];
+    let fixedMask = [];
+    let selectedCell = null;
+
+    // 4x4 기본 정답 템플릿들 (서로 다른 4가지 해답 보드)
+    const SOL_4X4 = [
+        [
+            [1, 2, 3, 4],
+            [3, 4, 1, 2],
+            [2, 1, 4, 3],
+            [4, 3, 2, 1]
+        ],
+        [
+            [2, 4, 1, 3],
+            [1, 3, 2, 4],
+            [3, 1, 4, 2],
+            [4, 2, 3, 1]
+        ],
+        [
+            [4, 1, 2, 3],
+            [2, 3, 4, 1],
+            [1, 4, 3, 2],
+            [3, 2, 1, 4]
+        ],
+        [
+            [3, 2, 4, 1],
+            [1, 4, 2, 3],
+            [4, 1, 3, 2],
+            [2, 3, 1, 4]
+        ]
+    ];
+
+    // 1코스: 7단계 × 각 4문제 (총 28문제 수록)
+    const TUTORIAL_STEPS = [
+        {
+            shortName: "1. 가로·세로 1칸",
+            problems: [
+                {
+                    solIdx: 0,
+                    blanks: [[0, 3]],
+                    msg: () => `<span class="step-badge">1단계 - 문제 1/4</span><br><span class="highlight-text">가로줄</span>에는 ${getRangeText(4)}가 한 번씩만 들어가요! 맨 윗줄의 빈칸 1개에 빠진 것을 넣어보세요.`
+                },
+                {
+                    solIdx: 1,
+                    blanks: [[2, 0]],
+                    msg: () => `<span class="step-badge">1단계 - 문제 2/4</span><br>세 번째 <span class="highlight-text">가로줄</span>을 살펴볼까요? 오른쪽에 3개가 채워져 있어요. 맨 왼쪽 빈칸에는 무엇이 들어갈까요?`
+                },
+                {
+                    solIdx: 2,
+                    blanks: [[3, 1]],
+                    msg: () => `<span class="step-badge">1단계 - 문제 3/4</span><br>이번엔 위아래로 긴 <span class="highlight-text">세로줄</span>을 볼까요? 두 번째 세로줄의 맨 아래 빈칸을 채워보세요!`
+                },
+                {
+                    solIdx: 3,
+                    blanks: [[1, 2]],
+                    msg: () => `<span class="step-badge">1단계 - 문제 4/4</span><br>분홍색 <span class="highlight-text">네모 방</span>이나 <span class="highlight-text">세로줄</span>을 보고 빈칸에 빠진 하나를 찾아 넣어보세요!`
+                }
+            ]
+        },
+        {
+            shortName: "2. 줄에서 2칸 찾기",
+            problems: [
+                {
+                    solIdx: 0,
+                    blanks: [[0, 1], [2, 3]],
+                    msg: () => `<span class="step-badge">2단계 - 문제 1/4</span><br>빈칸이 <b>2개</b>예요! 맨 윗줄(<span class="highlight-text">가로줄</span>)에서 1개, 맨 오른쪽 줄(<span class="highlight-text">세로줄</span>)에서 1개를 각각 찾아 채워보세요.`
+                },
+                {
+                    solIdx: 1,
+                    blanks: [[1, 0], [3, 2]],
+                    msg: () => `<span class="step-badge">2단계 - 문제 2/4</span><br>두 번째 가로줄에 빈칸이 1개, 맨 아랫줄에 빈칸이 1개 있어요. 하나씩 차례대로 채워볼까요?`
+                },
+                {
+                    solIdx: 2,
+                    blanks: [[0, 2], [2, 1]],
+                    msg: () => `<span class="step-badge">2단계 - 문제 3/4</span><br>가로줄과 세로줄을 살펴보면 각 빈칸마다 힌트가 3개씩 모여 있어요! 2칸 모두 완성해 보세요.`
+                },
+                {
+                    solIdx: 3,
+                    blanks: [[1, 3], [3, 0]],
+                    msg: () => `<span class="step-badge">2단계 - 문제 4/4</span><br>양쪽 끝에 떨어진 빈칸 2개예요! 각 줄에 없는 숫자가 무엇인지 찾아 넣어보세요.`
+                }
+            ]
+        },
+        {
+            shortName: "3. 네모방 2칸",
+            problems: [
+                {
+                    solIdx: 1,
+                    blanks: [[0, 1], [3, 2]],
+                    msg: () => `<span class="step-badge">3단계 - 문제 1/4</span><br>같은 색깔 <span class="highlight-text">2×2 네모 방</span> 안에도 ${getRangeText(4)}가 하나씩 들어가요! 파란 방과 주황 방의 빈칸을 채워보세요.`
+                },
+                {
+                    solIdx: 0,
+                    blanks: [[1, 2], [2, 1]],
+                    msg: () => `<span class="step-badge">3단계 - 문제 2/4</span><br>분홍색 방과 초록색 방에 빈칸이 1개씩 있어요! 같은 색깔 방 안에 없는 것을 찾아보세요.`
+                },
+                {
+                    solIdx: 2,
+                    blanks: [[0, 0], [3, 3]],
+                    msg: () => `<span class="step-badge">3단계 - 문제 3/4</span><br>파란 방 맨 위 칸과 주황 방 맨 아래 칸이 비어 있어요. 각 방 안의 숫자 3개를 보고 남은 하나를 찾아보세요!`
+                },
+                {
+                    solIdx: 3,
+                    blanks: [[1, 3], [2, 0]],
+                    msg: () => `<span class="step-badge">3단계 - 문제 4/4</span><br>분홍 방과 초록 방의 빈칸 2개를 모두 채우면 3단계도 클리어예요!`
+                }
+            ]
+        },
+        {
+            shortName: "4. 한 줄에 빈칸 2개!",
+            problems: [
+                {
+                    solIdx: 0,
+                    blanks: [[0, 1], [0, 3]],
+                    msg: () => `<span class="step-badge">4단계 - 문제 1/4</span><br>맨 윗줄에 빈칸이 <b>2개</b>나 있어요! 가로줄만 봐선 모르니, <span class="highlight-text">세로줄이나 네모 방</span>에 숫자 3개가 이미 채워진 칸부터 먼저 풀어보세요!`
+                },
+                {
+                    solIdx: 1,
+                    blanks: [[2, 0], [2, 2]],
+                    msg: () => `<span class="step-badge">4단계 - 문제 2/4</span><br>세 번째 가로줄에 빈칸이 2개예요! 위아래 <span class="highlight-text">세로줄</span>을 보면 쉽게 풀리는 칸이 먼저 보일 거예요.`
+                },
+                {
+                    solIdx: 2,
+                    blanks: [[1, 1], [3, 1]],
+                    msg: () => `<span class="step-badge">4단계 - 문제 3/4</span><br>이번엔 같은 <span class="highlight-text">세로줄</span>에 빈칸이 2개 있어요! 옆으로 긴 <span class="highlight-text">가로줄</span>을 먼저 살펴보면 정답을 바로 알 수 있답니다.`
+                },
+                {
+                    solIdx: 3,
+                    blanks: [[0, 2], [1, 2]],
+                    msg: () => `<span class="step-badge">4단계 - 문제 4/4</span><br>분홍 방 안에 빈칸이 위아래로 2개 있어요! 각 칸의 <span class="highlight-text">가로줄</span>을 보고 하나씩 채워보세요.`
+                }
+            ]
+        },
+        {
+            shortName: "5. 빈칸 3개 추리",
+            problems: [
+                {
+                    solIdx: 2,
+                    blanks: [[0, 1], [2, 1], [2, 3]],
+                    msg: () => `<span class="step-badge">5단계 - 문제 1/4</span><br>빈칸이 <b>3개</b>예요! <span class="highlight-text">빈칸이 1개뿐인 줄이나 방</span>부터 먼저 채우면 어렵던 옆 칸도 저절로 쉬워져요!`
+                },
+                {
+                    solIdx: 0,
+                    blanks: [[0, 0], [0, 2], [3, 2]],
+                    msg: () => `<span class="step-badge">5단계 - 문제 2/4</span><br>어느 칸이 가장 쉬울까요? 힌트 3개가 모여 있는 칸부터 징검다리처럼 순서대로 건너가 보세요!`
+                },
+                {
+                    solIdx: 1,
+                    blanks: [[1, 1], [1, 3], [3, 3]],
+                    msg: () => `<span class="step-badge">5단계 - 문제 3/4</span><br>파란 방의 빈칸을 먼저 채우면, 두 번째 가로줄의 남은 빈칸도 쉽게 풀 수 있어요!`
+                },
+                {
+                    solIdx: 3,
+                    blanks: [[0, 3], [2, 3], [2, 0]],
+                    msg: () => `<span class="step-badge">5단계 - 문제 4/4</span><br>빈칸 3개 중 가장 단서가 많은 곳을 찾아 차례차례 완성해 보세요!`
+                }
+            ]
+        },
+        {
+            shortName: "6. 빈칸 4개 도전",
+            problems: [
+                {
+                    solIdx: 2,
+                    blanks: [[0, 0], [0, 1], [1, 0], [1, 1]],
+                    msg: () => `<span class="step-badge">6단계 - 문제 1/4</span><br>파란 네모 방 4칸이 모두 비어 있어요! 방 안만 보면 모르지만, <span class="highlight-text">가로줄과 세로줄</span>을 보면 답이 숨어 있답니다!`
+                },
+                {
+                    solIdx: 0,
+                    blanks: [[0, 2], [0, 3], [1, 2], [1, 3]],
+                    msg: () => `<span class="step-badge">6단계 - 문제 2/4</span><br>이번엔 분홍 네모 방 4칸이 통째로 비어 있어요! 왼쪽 가로줄과 아래쪽 세로줄의 힌트를 모아 채워보세요.`
+                },
+                {
+                    solIdx: 1,
+                    blanks: [[2, 0], [2, 1], [3, 0], [3, 1]],
+                    msg: () => `<span class="step-badge">6단계 - 문제 3/4</span><br>초록 네모 방 4칸이 비어 있어요! 위쪽 파란 방과 오른쪽 주황 방의 숫자들을 단서로 활용해 보세요.`
+                },
+                {
+                    solIdx: 3,
+                    blanks: [[2, 2], [2, 3], [3, 2], [3, 3]],
+                    msg: () => `<span class="step-badge">6단계 - 문제 4/4</span><br>주황 네모 방 4칸을 모두 채우는 미션이에요! 가로줄과 세로줄을 차근차근 살펴보세요.`
+                }
+            ]
+        },
+        {
+            shortName: "7. 빈칸 6개 졸업!",
+            problems: [
+                {
+                    solIdx: 3,
+                    blanks: [[0, 1], [1, 0], [1, 3], [2, 2], [3, 1], [3, 3]],
+                    msg: () => `<span class="step-badge">7단계 - 문제 1/4</span><br>졸업 시험 시작! 빈칸이 <b>6개</b>예요. 헷갈리면 아래의 <b>🔍 쉬운 칸 찾기</b>를 눌러 어디부터 풀지 확인해 보세요!`
+                },
+                {
+                    solIdx: 0,
+                    blanks: [[0, 0], [0, 3], [1, 1], [2, 2], [3, 0], [3, 3]],
+                    msg: () => `<span class="step-badge">7단계 - 문제 2/4</span><br>네 모서리와 가운데가 비어있는 6칸 퍼즐이에요! 가운데 파란·주황 방부터 살펴볼까요?`
+                },
+                {
+                    solIdx: 1,
+                    blanks: [[0, 2], [1, 0], [1, 3], [2, 0], [2, 3], [3, 1]],
+                    msg: () => `<span class="step-badge">7단계 - 문제 3/4</span><br>가로줄에 빈칸이 1개뿐인 맨 윗줄과 맨 아랫줄부터 먼저 풀면 술술 풀려요!`
+                },
+                {
+                    solIdx: 2,
+                    blanks: [[0, 1], [0, 3], [1, 2], [2, 1], [3, 0], [3, 2]],
+                    msg: () => `<span class="step-badge">7단계 - 문제 4/4</span><br>1코스 마지막 문제예요! 이 문제를 풀면 스도쿠 탐험대 1코스를 완벽히 졸업하게 됩니다!`
+                }
+            ]
+        }
+    ];
+
+    function getRangeText(size = boardSize) {
+        const arr = [];
+        for (let i = 1; i <= size; i++) arr.push(SYMBOLS[symbolMode][i]);
+        return arr.join(', ');
+    }
+
+    function getSym(val) {
+        return SYMBOLS[symbolMode][val] || '';
+    }
+
+    function getSymName(val) {
+        return SYMBOL_NAMES[symbolMode][val] || '';
+    }
+
+    // 효과음 합성기
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    function playTone(type) {
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const now = audioCtx.currentTime;
+
+        if (type === 'pop') {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(523.25, now);
+            osc.frequency.exponentialRampToValueAtTime(659.25, now + 0.12);
+            gain.gain.setValueAtTime(0.18, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start(now);
+            osc.stop(now + 0.15);
+        } else if (type === 'wrong') {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(220, now);
+            osc.frequency.setValueAtTime(180, now + 0.1);
+            gain.gain.setValueAtTime(0.2, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start(now);
+            osc.stop(now + 0.25);
+        } else if (type === 'win') {
+            const notes = [523.25, 659.25, 783.99, 1046.50];
+            notes.forEach((freq, idx) => {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(freq, now + idx * 0.1);
+                gain.gain.setValueAtTime(0.2, now + idx * 0.1);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + idx * 0.1 + 0.25);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start(now + idx * 0.1);
+                osc.stop(now + idx * 0.1 + 0.25);
+            });
+        }
+    }
+
+    function isStepFullyCleared(stepIdx) {
+        for (let p = 0; p < 4; p++) {
+            if (!clearedTutorialProbs.has(`${stepIdx}-${p}`)) return false;
+        }
+        return true;
+    }
+
+    function renderTutorialBar() {
+        const bar = document.getElementById('tutorial-bar');
+        bar.innerHTML = '';
+        TUTORIAL_STEPS.forEach((step, idx) => {
+            const btn = document.createElement('button');
+            btn.className = 'step-chip';
+            const allDone = isStepFullyCleared(idx);
+            if (idx === tutorialStep) btn.classList.add('active');
+            else if (allDone) btn.classList.add('cleared');
+
+            btn.textContent = (allDone ? '🌟 ' : '') + step.shortName;
+            btn.onclick = () => loadTutorialProblem(idx, 0);
+            bar.appendChild(btn);
+        });
+    }
+
+    function renderSubProblemBar() {
+        const bar = document.getElementById('sub-problem-bar');
+        bar.innerHTML = '';
+
+        for (let p = 0; p < 4; p++) {
+            const btn = document.createElement('button');
+            btn.className = 'prob-btn';
+
+            if (gameMode === 'tutorial') {
+                const key = `${tutorialStep}-${p}`;
+                const done = clearedTutorialProbs.has(key);
+                if (p === tutorialProbIdx) btn.classList.add('active');
+                if (done) btn.classList.add('cleared');
+                btn.textContent = (done ? '✅ ' : '✏️ ') + `문제 ${p + 1}`;
+                btn.onclick = () => loadTutorialProblem(tutorialStep, p);
+            } else {
+                const key = `${boardSize}-${difficulty}-${p}`;
+                const done = clearedPlayProbs.has(key);
+                if (p === playProbIdx) btn.classList.add('active');
+                if (done) btn.classList.add('cleared');
+                btn.textContent = (done ? '✅ ' : '🎯 ') + `문제 ${p + 1}`;
+                btn.onclick = () => loadPlayProblem(p);
+            }
+            bar.appendChild(btn);
+        }
+    }
+
+    function renderNumpad() {
+        const pad = document.getElementById('numpad');
+        pad.innerHTML = '';
+        for (let i = 1; i <= boardSize; i++) {
+            const btn = document.createElement('button');
+            btn.className = 'num-btn';
+            btn.textContent = getSym(i);
+            btn.onclick = () => inputNumber(i);
+            pad.appendChild(btn);
+        }
+        const eraseBtn = document.createElement('button');
+        eraseBtn.className = 'num-btn erase-btn';
+        eraseBtn.textContent = '🧽 지우개';
+        eraseBtn.onclick = () => inputNumber(0);
+        pad.appendChild(eraseBtn);
+    }
+
+    function switchMode(mode) {
+        gameMode = mode;
+        document.getElementById('tab-tutorial').classList.toggle('active', mode === 'tutorial');
+        document.getElementById('tab-play').classList.toggle('active', mode === 'play');
+        document.getElementById('tutorial-bar').style.display = mode === 'tutorial' ? 'flex' : 'none';
+        document.getElementById('play-settings').style.display = mode === 'play' ? 'flex' : 'none';
+
+        const nextBtn = document.getElementById('btn-next-or-new');
+        if (mode === 'tutorial') {
+            boardSize = 4;
+            nextBtn.textContent = '🔄 이 문제 다시하기';
+            loadTutorialProblem(tutorialStep, tutorialProbIdx);
+        } else {
+            nextBtn.textContent = '🎲 새로운 랜덤 문제';
+            loadPlayProblem(playProbIdx);
+        }
+    }
+
+    function setSymbolMode(mode) {
+        symbolMode = mode;
+        document.getElementById('btn-symbol-num').classList.toggle('active', mode === 'number');
+        document.getElementById('btn-symbol-fruit').classList.toggle('active', mode === 'fruit');
+        renderNumpad();
+
+        if (gameMode === 'tutorial') {
+            const prob = TUTORIAL_STEPS[tutorialStep].problems[tutorialProbIdx];
+            showGuide('🦉', prob.msg());
+        }
+        renderBoard();
+    }
+
+    function setBoardSize(size) {
+        boardSize = size;
+        playProbIdx = 0;
+        [4, 5, 6].forEach(s => {
+            document.getElementById(`size-${s}`).classList.toggle('active', s === size);
+        });
+        loadPlayProblem(0);
+    }
+
+    function setDifficulty(diff) {
+        difficulty = diff;
+        playProbIdx = 0;
+        ['easy', 'normal', 'hard'].forEach(d => {
+            document.getElementById(`diff-${d}`).classList.toggle('active', d === diff);
+        });
+        loadPlayProblem(0);
+    }
+
+    function loadTutorialProblem(stepIdx, probIdx) {
+        tutorialStep = stepIdx;
+        tutorialProbIdx = probIdx;
+        boardSize = 4;
+
+        renderTutorialBar();
+        renderSubProblemBar();
+        renderNumpad();
+
+        const prob = TUTORIAL_STEPS[stepIdx].problems[probIdx];
+        const baseSol = SOL_4X4[prob.solIdx];
+
+        solution = baseSol.map(row => [...row]);
+        puzzle = baseSol.map(row => [...row]);
+        prob.blanks.forEach(([r, c]) => {
+            puzzle[r][c] = 0;
+        });
+
+        fixedMask = puzzle.map(row => row.map(v => v !== 0));
+        selectedCell = findBestEmptyCell() || { r: 0, c: 0 };
+
+        showGuide('🦉', prob.msg());
+        renderBoard();
+    }
+
+    // 2코스용 시드 기반 결정론적 문제 생성 (문제 1~4번이 각기 고유한 구성을 갖도록 보장)
+    function seededRandom(seed) {
+        let s = seed % 2147483647;
+        if (s <= 0) s += 2147483646;
+        return function() {
+            s = (s * 16807) % 2147483647;
+            return (s - 1) / 2147483646;
+        };
+    }
+
+    function generateBoardWithRng(size, rng) {
+        let base = [];
+        if (size === 4) {
+            base = [
+                [1, 2, 3, 4],
+                [3, 4, 1, 2],
+                [2, 1, 4, 3],
+                [4, 3, 2, 1]
+            ];
+        } else if (size === 5) {
+            base = [
+                [1, 2, 3, 4, 5],
+                [2, 3, 4, 5, 1],
+                [3, 4, 5, 1, 2],
+                [4, 5, 1, 2, 3],
+                [5, 1, 2, 3, 4]
+            ];
+        } else if (size === 6) {
+            base = [
+                [1, 2, 3, 4, 5, 6],
+                [4, 5, 6, 1, 2, 3],
+                [2, 3, 1, 5, 6, 4],
+                [5, 6, 4, 2, 3, 1],
+                [3, 1, 2, 6, 4, 5],
+                [6, 4, 5, 3, 1, 2]
+            ];
+        }
+
+        const nums = Array.from({ length: size }, (_, i) => i + 1);
+        for (let i = nums.length - 1; i > 0; i--) {
+            const j = Math.floor(rng() * (i + 1));
+            [nums[i], nums[j]] = [nums[j], nums[i]];
+        }
+        let grid = base.map(row => row.map(v => nums[v - 1]));
+
+        if (size === 4) {
+            if (rng() < 0.5) [grid[0], grid[1]] = [grid[1], grid[0]];
+            if (rng() < 0.5) [grid[2], grid[3]] = [grid[3], grid[2]];
+        } else if (size === 5) {
+            for (let i = 4; i > 0; i--) {
+                const j = Math.floor(rng() * (i + 1));
+                [grid[i], grid[j]] = [grid[j], grid[i]];
+            }
+        } else if (size === 6) {
+            if (rng() < 0.5) [grid[0], grid[1]] = [grid[1], grid[0]];
+            if (rng() < 0.5) [grid[2], grid[3]] = [grid[3], grid[2]];
+            if (rng() < 0.5) [grid[4], grid[5]] = [grid[5], grid[4]];
+        }
+        return grid;
+    }
+
+    function loadPlayProblem(probIdx, customRandom = false) {
+        playProbIdx = probIdx;
+        renderSubProblemBar();
+        renderNumpad();
+
+        // 2코스에서는 이미 규칙을 배웠으므로 상단 부엉이 설명 박스를 숨김!
+        hideGuide();
+
+        const diffCode = { easy: 11, normal: 23, hard: 37 }[difficulty];
+        const seed = customRandom
+            ? Math.floor(Math.random() * 1000000) + 1
+            : (boardSize * 1000 + diffCode * 50 + (probIdx + 1) * 13);
+
+        const rng = seededRandom(seed);
+        solution = generateBoardWithRng(boardSize, rng);
+        puzzle = solution.map(row => [...row]);
+
+        const blankTable = {
+            4: { easy: 4, normal: 6, hard: 8 },
+            5: { easy: 6, normal: 9, hard: 12 },
+            6: { easy: 8, normal: 12, hard: 16 }
+        };
+        const blanks = blankTable[boardSize][difficulty];
+
+        const positions = [];
+        for (let r = 0; r < boardSize; r++) {
+            for (let c = 0; c < boardSize; c++) positions.push([r, c]);
+        }
+        for (let i = positions.length - 1; i > 0; i--) {
+            const j = Math.floor(rng() * (i + 1));
+            [positions[i], positions[j]] = [positions[j], positions[i]];
+        }
+
+        for (let i = 0; i < blanks; i++) {
+            const [r, c] = positions[i];
+            puzzle[r][c] = 0;
+        }
+
+        fixedMask = puzzle.map(row => row.map(v => v !== 0));
+        selectedCell = findBestEmptyCell();
+        renderBoard();
+    }
+
+    function getBoxIndex(r, c) {
+        if (boardSize === 4) {
+            return Math.floor(r / 2) * 2 + Math.floor(c / 2);
+        } else if (boardSize === 6) {
+            return Math.floor(r / 2) * 2 + Math.floor(c / 3);
+        }
+        return null;
+    }
+
+    function getBoxCells(r, c) {
+        if (boardSize === 4) {
+            const sr = Math.floor(r / 2) * 2;
+            const sc = Math.floor(c / 2) * 2;
+            const list = [];
+            for (let rr = sr; rr < sr + 2; rr++) {
+                for (let cc = sc; cc < sc + 2; cc++) list.push({ r: rr, c: cc });
+            }
+            return list;
+        } else if (boardSize === 6) {
+            const sr = Math.floor(r / 2) * 2;
+            const sc = Math.floor(c / 3) * 3;
+            const list = [];
+            for (let rr = sr; rr < sr + 2; rr++) {
+                for (let cc = sc; cc < sc + 3; cc++) list.push({ r: rr, c: cc });
+            }
+            return list;
+        }
+        return [];
+    }
+
+    function updateRemainingCount() {
+        let count = 0;
+        for (let r = 0; r < boardSize; r++) {
+            for (let c = 0; c < boardSize; c++) {
+                if (puzzle[r][c] === 0) count++;
+            }
+        }
+        document.getElementById('remain-pill').textContent = `남은 빈칸: ${count}개`;
+    }
+
+    function renderBoard(conflictCoords = [], easySpot = null) {
+        const boardEl = document.getElementById('board');
+        boardEl.className = `board size-${boardSize}`;
+        boardEl.innerHTML = '';
+
+        updateRemainingCount();
+
+        for (let r = 0; r < boardSize; r++) {
+            for (let c = 0; c < boardSize; c++) {
+                const cell = document.createElement('div');
+                const boxIdx = getBoxIndex(r, c);
+
+                if (boxIdx !== null) {
+                    cell.className = `cell box-${boxIdx}`;
+                } else {
+                    cell.className = `cell ${r % 2 === 0 ? 'box-row-even' : 'box-row-odd'}`;
+                }
+
+                if (boardSize === 4 && c === 1) cell.classList.add('thick-right');
+                if (boardSize === 4 && r === 1) cell.classList.add('thick-bottom');
+                if (boardSize === 6 && c === 2) cell.classList.add('thick-right');
+                if (boardSize === 6 && (r === 1 || r === 3)) cell.classList.add('thick-bottom');
+
+                if (fixedMask[r][c]) {
+                    cell.classList.add('fixed');
+                } else if (puzzle[r][c] !== 0) {
+                    cell.classList.add('user-filled');
+                }
+
+                if (selectedCell) {
+                    const sameRow = selectedCell.r === r;
+                    const sameCol = selectedCell.c === c;
+                    const selBox = getBoxIndex(selectedCell.r, selectedCell.c);
+                    const sameBox = selBox !== null && selBox === boxIdx;
+                    if (sameRow && sameCol) {
+                        cell.classList.add('selected');
+                    } else if (sameRow || sameCol || sameBox) {
+                        cell.classList.add('related');
+                    }
+                }
+
+                if (easySpot && easySpot.r === r && easySpot.c === c) {
+                    cell.classList.add('easy-spot');
+                }
+
+                if (conflictCoords.some(pt => pt.r === r && pt.c === c)) {
+                    cell.classList.add('conflict');
+                }
+
+                cell.textContent = getSym(puzzle[r][c]);
+                cell.onclick = () => selectCell(r, c);
+                boardEl.appendChild(cell);
+            }
+        }
+    }
+
+    function selectCell(r, c) {
+        if (fixedMask[r][c]) {
+            if (gameMode === 'tutorial') {
+                showGuide('🐣', `그 칸은 처음부터 채워져 있는 칸이에요! 비어 있는 칸을 눌러볼까요?`);
+            }
+            return;
+        }
+        selectedCell = { r, c };
+        renderBoard();
+    }
+
+    function findConflict(r, c, val) {
+        for (let col = 0; col < boardSize; col++) {
+            if (col !== c && puzzle[r][col] === val) {
+                return {
+                    coord: { r, c: col },
+                    msg: `앗! 같은 <span class="highlight-text">가로줄</span>에 이미 <b>${getSymName(val)}</b>가 있어요!`
+                };
+            }
+        }
+        for (let row = 0; row < boardSize; row++) {
+            if (row !== r && puzzle[row][c] === val) {
+                return {
+                    coord: { r: row, c },
+                    msg: `앗! 같은 <span class="highlight-text">세로줄</span>에 이미 <b>${getSymName(val)}</b>가 있어요!`
+                };
+            }
+        }
+        const boxCells = getBoxCells(r, c);
+        for (const pt of boxCells) {
+            if ((pt.r !== r || pt.c !== c) && puzzle[pt.r][pt.c] === val) {
+                return {
+                    coord: pt,
+                    msg: `앗! 같은 색깔 <span class="highlight-text">네모 방</span> 안에 이미 <b>${getSymName(val)}</b>가 들어있어요!`
+                };
+            }
+        }
+        return null;
+    }
+
+    function inputNumber(val) {
+        if (!selectedCell) return;
+
+        const { r, c } = selectedCell;
+        if (fixedMask[r][c]) return;
+
+        if (val === 0) {
+            puzzle[r][c] = 0;
+            if (gameMode === 'tutorial') {
+                showGuide('🦉', `칸을 깨끗하게 지웠어요!`);
+            } else {
+                hideGuide();
+            }
+            renderBoard();
+            return;
+        }
+
+        const conflict = findConflict(r, c, val);
+        if (conflict) {
+            playTone('wrong');
+            showGuide('🙊', conflict.msg);
+            renderBoard([{ r, c }, conflict.coord]);
+            return;
+        }
+
+        if (val !== solution[r][c]) {
+            playTone('wrong');
+            showGuide('🤔', `지금 당장은 겹치지 않지만, 여기에 <b>${getSymName(val)}</b>를 넣으면 다른 빈칸을 풀 수 없어요! 조금 더 쉬운 칸부터 찾아볼까요?`);
+            renderBoard([{ r, c }]);
+            return;
+        }
+
+        // 정답 입력
+        puzzle[r][c] = val;
+        playTone('pop');
+
+        if (isBoardComplete()) {
+            if (gameMode === 'play') hideGuide();
+            renderBoard();
+            setTimeout(() => handleStageClear(), 260);
+        } else {
+            selectedCell = findBestEmptyCell();
+            if (gameMode === 'tutorial') {
+                showGuide('🥳', `정답이에요! <b>${getSymName(val)}</b>를 잘 찾았어요! 남은 빈칸도 채워볼까요?`);
+            } else {
+                hideGuide();
+            }
+            renderBoard();
+        }
+    }
+
+    function findBestEmptyCell() {
+        let bestCell = null;
+        let maxClues = -1;
+
+        for (let r = 0; r < boardSize; r++) {
+            for (let c = 0; c < boardSize; c++) {
+                if (puzzle[r][c] !== 0) continue;
+
+                const rowFilled = puzzle[r].filter(v => v !== 0).length;
+                const colFilled = Array.from({ length: boardSize }, (_, idx) => puzzle[idx][c]).filter(v => v !== 0).length;
+                const boxFilled = getBoxCells(r, c).map(pt => puzzle[pt.r][pt.c]).filter(v => v !== 0).length;
+
+                const score = Math.max(rowFilled, colFilled, boxFilled);
+                if (score > maxClues) {
+                    maxClues = score;
+                    bestCell = { r, c, rowFilled, colFilled, boxFilled };
+                }
+            }
+        }
+        return bestCell;
+    }
+
+    function highlightEasiestCell() {
+        const best = findBestEmptyCell();
+        if (!best) return;
+
+        selectedCell = { r: best.r, c: best.c };
+        let reason = '가로줄';
+        if (best.colFilled >= best.rowFilled && best.colFilled >= best.boxFilled) reason = '세로줄';
+        else if (best.boxFilled >= best.rowFilled && best.boxFilled >= best.colFilled) reason = '같은 색깔 네모 방';
+
+        showGuide('🔍', `초록색 테두리 칸의 <span class="highlight-text">${reason}</span>을 살펴보세요! 채워진 숫자가 많아서 가장 쉽게 답을 찾을 수 있어요.`);
+        renderBoard([], selectedCell);
+    }
+
+    function giveHint() {
+        if (!selectedCell || puzzle[selectedCell.r][selectedCell.c] !== 0) {
+            selectedCell = findBestEmptyCell();
+        }
+        if (!selectedCell) return;
+
+        const { r, c } = selectedCell;
+        const ans = solution[r][c];
+
+        const rowUsed = puzzle[r].filter(v => v !== 0);
+        const colUsed = Array.from({ length: boardSize }, (_, idx) => puzzle[idx][c]).filter(v => v !== 0);
+        const boxUsed = getBoxCells(r, c).map(pt => puzzle[pt.r][pt.c]).filter(v => v !== 0);
+
+        let hintText = '';
+        if (rowUsed.length >= colUsed.length && rowUsed.length >= boxUsed.length && rowUsed.length > 0) {
+            const usedNames = rowUsed.map(v => getSym(v)).join(', ');
+            hintText = `💡 <b>선생님 힌트:</b> 지금 칸의 <span class="highlight-text">가로줄</span>에 이미 <b>${usedNames}</b>가 있어요. 빠진 정답은 <b>${getSymName(ans)}</b>예요!`;
+        } else if (colUsed.length >= boxUsed.length && colUsed.length > 0) {
+            const usedNames = colUsed.map(v => getSym(v)).join(', ');
+            hintText = `💡 <b>선생님 힌트:</b> 지금 칸의 <span class="highlight-text">세로줄</span>에 이미 <b>${usedNames}</b>가 있어요. 남은 정답은 <b>${getSymName(ans)}</b>랍니다!`;
+        } else if (boxUsed.length > 0) {
+            const usedNames = boxUsed.map(v => getSym(v)).join(', ');
+            hintText = `💡 <b>선생님 힌트:</b> 같은 색깔 <span class="highlight-text">네모 방</span> 안에 <b>${usedNames}</b>가 있어요. 빈자리에 들어갈 정답은 <b>${getSymName(ans)}</b>예요!`;
+        } else {
+            hintText = `💡 <b>선생님 힌트:</b> 가로줄과 세로줄의 숫자들을 모아보면, 이 자리에 들어갈 정답은 <b>${getSymName(ans)}</b>예요!`;
+        }
+
+        showGuide('🦉', hintText);
+        renderBoard();
+    }
+
+    function isBoardComplete() {
+        for (let r = 0; r < boardSize; r++) {
+            for (let c = 0; c < boardSize; c++) {
+                if (puzzle[r][c] !== solution[r][c]) return false;
+            }
+        }
+        return true;
+    }
+
+    function handleStageClear() {
+        playTone('win');
+        const modal = document.getElementById('win-modal');
+        const title = document.getElementById('modal-title');
+        const desc = document.getElementById('modal-desc');
+        const nextBtn = document.getElementById('modal-next-btn');
+
+        if (gameMode === 'tutorial') {
+            clearedTutorialProbs.add(`${tutorialStep}-${tutorialProbIdx}`);
+            renderTutorialBar();
+            renderSubProblemBar();
+
+            if (tutorialProbIdx < 3) {
+                title.textContent = `${tutorialStep + 1}단계 - 문제 ${tutorialProbIdx + 1} 성공! 🎉`;
+                desc.textContent = `아주 잘했어요! 이 단계의 다음 문제(문제 ${tutorialProbIdx + 2})도 풀어볼까요?`;
+                nextBtn.textContent = `문제 ${tutorialProbIdx + 2} 풀기 🚀`;
+            } else if (tutorialStep < TUTORIAL_STEPS.length - 1) {
+                title.textContent = `${tutorialStep + 1}단계 4문제 모두 클리어! 🌟`;
+                desc.textContent = `이 단계의 4문제를 완벽하게 마스터했어요! 다음 단계로 올라가 볼까요?`;
+                nextBtn.textContent = `${tutorialStep + 2}단계로 출발! 🚀`;
+            } else {
+                title.textContent = `1코스 28문제 전체 졸업! 🎓`;
+                desc.textContent = `대단해요! 7단계의 모든 문제를 풀었어요. 이제 2코스 놀이터로 가볼까요?`;
+                nextBtn.textContent = `2코스 놀이터 가기 🎮`;
+            }
+        } else {
+            clearedPlayProbs.add(`${boardSize}-${difficulty}-${playProbIdx}`);
+            renderSubProblemBar();
+
+            title.textContent = `${boardSize}×${boardSize} 문제 ${playProbIdx + 1} 완성! 🏆`;
+            if (playProbIdx < 3) {
+                desc.textContent = `혼자 힘으로 멋지게 풀었어요! 다음 문제(문제 ${playProbIdx + 2})도 도전해 볼까요?`;
+                nextBtn.textContent = `문제 ${playProbIdx + 2} 도전! 🚀`;
+            } else {
+                desc.textContent = `이 난이도의 4문제를 모두 정복했어요! 새로운 문제에 계속 도전해 보세요!`;
+                nextBtn.textContent = `새로운 문제 풀기 🎲`;
+            }
+        }
+        modal.style.display = 'flex';
+    }
+
+    function closeModalAndNext() {
+        document.getElementById('win-modal').style.display = 'none';
+        if (gameMode === 'tutorial') {
+            if (tutorialProbIdx < 3) {
+                loadTutorialProblem(tutorialStep, tutorialProbIdx + 1);
+            } else if (tutorialStep < TUTORIAL_STEPS.length - 1) {
+                loadTutorialProblem(tutorialStep + 1, 0);
+            } else {
+                switchMode('play');
+            }
+        } else {
+            if (playProbIdx < 3) {
+                loadPlayProblem(playProbIdx + 1);
+            } else {
+                loadPlayProblem(0, true);
+            }
+        }
+    }
+
+    function handleNextAction() {
+        if (gameMode === 'tutorial') {
+            loadTutorialProblem(tutorialStep, tutorialProbIdx);
+        } else {
+            loadPlayProblem(playProbIdx, true);
+        }
+    }
+
+    function showGuide(emoji, htmlText) {
+        const box = document.getElementById('guide-box');
+        box.classList.remove('hidden');
+        document.getElementById('mascot-face').textContent = emoji;
+        document.getElementById('guide-text').innerHTML = htmlText;
+    }
+
+    function hideGuide() {
+        const box = document.getElementById('guide-box');
+        box.classList.add('hidden');
+    }
+
+    window.addEventListener('keydown', (e) => {
+        const num = parseInt(e.key, 10);
+        if (num >= 1 && num <= boardSize) {
+            inputNumber(num);
+        } else if (e.key === 'Backspace' || e.key === 'Delete' || e.key === '0') {
+            inputNumber(0);
+        }
+    });
+
+    // 초기 실행
+    loadTutorialProblem(0, 0);
+</script>
+
+</body>
+</html>
